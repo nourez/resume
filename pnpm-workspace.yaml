@@ -1,0 +1,7 @@
+packages:
+  - apps/web
+  - apps/api
+  - infra
+
+engineStrict: true
+saveExact: true
