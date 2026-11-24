@@ -8,10 +8,11 @@ Apple Reminders P0-02 requires agreed development tools, preview ports, browser 
 
 **Goals:**
 
-- A repository-defined Dev Containers environment intended for VS Code and Zed.
+- A repository-defined Dev Containers environment intended for Codex Cloud and Zed.
 - Repeatable setup with pinned tools, locked dependencies, browser prerequisites, and documented network and container build requirements.
 - Ordinary editing, local browser checks, and dependency installation without AWS credentials.
 - Reusable, editor-independent bootstrap logic that P0-04 can later evaluate for Codex Cloud.
+- Git works from inside the container in Zed.
 
 **Non-Goals:**
 
@@ -65,7 +66,9 @@ Document optional, short-lived development-account authentication supplied at ru
 
 Use a clean container build plus setup twice, version checks, a headless Chromium launch/page assertion, a temporary HTTP listener over preview ports, and a disposable Docker build on the documented host path. Check tracked files, build exclusions, and image configuration/history for credential handling without exposing real secrets. Record host/editor/engine versions, architecture, commands, results, and unavailable checks in development documentation.
 
-VS Code and Zed opening/rebuilding instructions follow their official documentation, but documentation support does not prove this repository works in either editor. P0-05 owns full editor/cloud fresh-checkout acceptance; P0-02 records the subset actually exercised. Failed available checks must be fixed; unavailable capabilities require a concrete limitation and fallback.
+Use Zed's Dev Containers workflow for opening and rebuilding locally. For Codex Cloud, document how to build and run the repository image when the managed environment offers Docker access. Check daemon access and required downloads in the selected environment. If that path is unavailable, document the host build fallback and identify the shared bootstrap entry point for the Codex Cloud install script in P0-04.
+
+In Zed, check that Git can read the mounted checkout and show a diff for a temporary edit from the non-root container terminal. P0-02 records checks actually run, any limitations, and the available fallback. P0-05 owns full fresh-checkout acceptance.
 
 ## Risks / Trade-offs
 
@@ -89,7 +92,7 @@ No unresolved scope decisions block implementation. Implementation must record e
 
 - PRD: `/Users/nourez/Desktop/cloud-resume-portfolio-prd.docx`, Development environment DEV-01–DEV-06 and technology/security tooling choices.
 - Dev Containers configuration reference: https://github.com/devcontainers/spec/blob/main/docs/specs/devcontainerjson-reference.md
-- VS Code lifecycle/setup: https://code.visualstudio.com/docs/devcontainers/create-dev-container
+- Codex Cloud environment setup: https://learn.chatgpt.com/docs/environments/cloud-environments
 - Zed opening and rebuild behavior: https://zed.dev/docs/dev-containers
 - Playwright browser prerequisites: https://playwright.dev/docs/browsers
 - Playwright Docker guidance: https://playwright.dev/docs/docker

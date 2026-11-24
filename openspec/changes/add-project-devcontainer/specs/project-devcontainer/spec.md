@@ -2,20 +2,32 @@
 
 ### Requirement: Repository-defined development container
 
-The repository SHALL provide `.devcontainer/devcontainer.json` and its image definition using the Dev Containers specification, with a non-root development user, an init process, and a writable workspace. Essential setup SHALL be editor-independent. The image definition SHALL support Linux amd64 and arm64 without silently forcing emulation; documentation SHALL identify tested architectures and any unavailable verification.
+The repository SHALL provide a Dev Containers configuration and image with a non-root development user, an init process, and a writable workspace. Zed SHALL be able to open and rebuild the container. The image SHALL support Linux amd64 and arm64 without forcing emulation.
 
 #### Scenario: Open a clean checkout
-- **WHEN** a developer builds and opens the configuration on a supported host with its documented prerequisites
+- **WHEN** a developer opens a clean checkout in Zed using the documented Dev Containers prerequisites
 - **THEN** the container starts with the checkout accessible and development terminals running as the non-root user
 - **AND** dependency and browser caches are writable by that user
+
+#### Scenario: Rebuild in Zed
+- **WHEN** a developer follows the documented rebuild procedure in Zed
+- **THEN** Zed opens the rebuilt container with the checkout and bootstrap available
 
 #### Scenario: Unsupported architecture
 - **WHEN** installation encounters an architecture without a supported tool asset
 - **THEN** setup fails with an actionable error instead of installing a binary for another architecture
 
+### Requirement: Git works inside the Zed container
+
+Git SHALL be available to the non-root development user and able to discover and read the mounted checkout. Local Git operations SHALL work without remote credentials.
+
+#### Scenario: Inspect a local change from Zed
+- **WHEN** the development user makes a temporary tracked-file edit in a disposable checkout and runs `git status` and `git diff` from Zed's container terminal
+- **THEN** Git recognizes the repository and reports the edit without an ownership error or credential prompt
+
 ### Requirement: Pinned development tools
 
-The environment SHALL preserve Node.js 24.16.0, pnpm 12.21.0, and TypeScript 7.0.2 and provide CDK CLI, OpenSpec, Playwright, AWS CLI v2, Docker CLI, Buildx, Trivy, and Cosign with documented invocation paths. New application-level tools SHALL use exact committed versions; JavaScript dependencies SHALL be recorded in `pnpm-lock.yaml`. The base image SHALL be pinned by digest and downloaded native-tool release assets SHALL be checksum-verified. Documentation SHALL distinguish OS package and scanner database updates from pinned tool versions.
+The environment SHALL preserve Node.js 24.16.0, pnpm 12.21.0, and TypeScript 7.0.2 and provide CDK CLI, OpenSpec, Playwright, AWS CLI v2, Docker CLI, Buildx, Trivy, and Cosign. Tool versions and JavaScript dependencies SHALL be pinned in the repository, with JavaScript dependencies recorded in `pnpm-lock.yaml`. The base image SHALL be pinned by digest and native downloads SHALL be checksum-verified.
 
 #### Scenario: Inspect installed tools
 - **WHEN** the developer runs the documented version commands after successful setup
@@ -28,7 +40,7 @@ The environment SHALL preserve Node.js 24.16.0, pnpm 12.21.0, and TypeScript 7.0
 
 ### Requirement: Repeatable workspace bootstrap
 
-The repository SHALL provide an editor-independent bootstrap entry point invoked during container creation. It SHALL validate runtime pins, install dependencies using `pnpm install --frozen-lockfile`, and prepare the locked Playwright browser revision. It SHALL be safe to rerun, preserve the lockfile, propagate failures, and require no cloud deployment or credentials.
+The repository SHALL provide an editor-independent bootstrap entry point invoked during container creation and reusable by a Codex Cloud install script. It SHALL validate runtime pins, run `pnpm install --frozen-lockfile`, and prepare the locked Playwright browser revision. It SHALL be safe to rerun, preserve the lockfile, propagate failures, and require no cloud deployment or credentials.
 
 #### Scenario: Initial bootstrap and rerun
 - **WHEN** bootstrap runs on a clean checkout and then runs a second time in the same container
@@ -82,14 +94,27 @@ The development configuration SHALL keep credentials outside committed files and
 
 ### Requirement: Setup documentation and honest verification evidence
 
-The repository SHALL document VS Code and Zed open/rebuild procedures, tooling invocation, network prerequisites, browser setup, preview access, container builds, and credential handling. Evidence SHALL identify commands, results, host/engine/editor versions where applicable, and architecture. Unavailable checks SHALL have explicit limitations and a supported fallback; full VS Code, Zed, and Codex Cloud fresh-checkout verification SHALL remain tracked under P0-05, with Codex Cloud setup under P0-04. CodeQL/Dependabot pipeline configuration and shared application commands SHALL remain with their separate tickets.
+The repository SHALL document Zed open/rebuild procedures, Git from the container terminal, tooling invocation, network prerequisites, browser setup, preview access, container builds, and credential handling. Evidence SHALL identify commands, results, host/engine/editor versions where applicable, and architecture. P0-05 owns full fresh-checkout verification.
 
 #### Scenario: Follow setup guidance
 - **WHEN** a developer follows the container documentation from a fresh checkout
 - **THEN** prerequisites, setup entry points, tool commands, and recovery steps are explicit
 - **AND** image registry, package registry, OS repository, release download, browser download, and scanner database network needs are stated
+- **AND** the guide distinguishes OS package and scanner database updates from pinned tool versions
 
-#### Scenario: An editor or architecture was not exercised
-- **WHEN** an editor, architecture, or cloud environment cannot be tested during P0-02
+#### Scenario: A target was not exercised
+- **WHEN** Zed, an architecture, or a Codex Cloud environment cannot be tested during P0-02
 - **THEN** documentation labels its verification as pending or unavailable and states the limitation and fallback
-- **AND** it does not present documentation-based compatibility as observed success
+
+### Requirement: Codex Cloud container workflow
+
+The repository SHALL document how to check Docker daemon and download access in Codex Cloud and how to build and run the image where supported. P0-04 owns integration with the Codex Cloud environment install script.
+
+#### Scenario: Codex Cloud supports container builds
+- **WHEN** the managed environment has usable Docker access and can reach the required downloads
+- **THEN** the documented commands build and run the repository image in that environment
+
+#### Scenario: Codex Cloud container access is unavailable
+- **WHEN** the managed Codex Cloud environment lacks usable Docker access or cannot reach the required downloads
+- **THEN** the documentation records the limitation and points to the host build workflow
+- **AND** it identifies the reusable bootstrap entry point for P0-04's managed environment setup

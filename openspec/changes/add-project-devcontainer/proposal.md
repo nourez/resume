@@ -7,7 +7,7 @@ The P0-01 monorepo pins Node.js, pnpm, and TypeScript but leaves developers to a
 - Add a Dev Containers configuration and image definition with a non-root development user and pinned project tooling: Node.js, pnpm, TypeScript, CDK CLI, Playwright, OpenSpec, Docker CLI/Buildx, AWS CLI, Trivy, and Cosign.
 - Add repeatable bootstrap logic for locked dependency installation and browser setup, with explicit invocation paths for tools and security checks.
 - Define frontend preview ports, browser system dependencies, supported CPU architectures, container build access, and network prerequisites.
-- Document opening/rebuilding the container in VS Code and Zed, host-side container build fallback, and credential boundaries. Record only capabilities actually checked.
+- Document opening/rebuilding the container in Codex Cloud and Zed, host-side container build fallback, and credential boundaries. Record only capabilities actually checked.
 - Keep P0-03 application scripts/scaffolds, P0-04 Codex Cloud integration, P0-05 full editor/cloud verification, P0-06 project-wide guidance, and delivery/security pipelines outside this change.
 
 ## Capabilities
